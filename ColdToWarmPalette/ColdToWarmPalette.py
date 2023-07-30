@@ -24,7 +24,6 @@
  
 from krita import *
 import  math, os, random, json
-from datetime import datetime
 from functools import partial
 
  
@@ -386,7 +385,7 @@ class ColdToWarmPalette(DockWidget):
     def generateSatStrip(self):
         cm = self.color_manager
 
-        random.seed(datetime.now())
+        random.seed()
         col =  self.gen_color[2][2].toHSV()
         self.sat_color[2].setColorHSV( col["H"], col["S"], col["V"]) 
 
@@ -410,7 +409,7 @@ class ColdToWarmPalette(DockWidget):
     def generateHueStrip(self):
         cm = self.color_manager
 
-        random.seed(datetime.now())
+        random.seed()
         col =  self.gen_color[2][2].toHSV()
         self.hue_color[2].setColorHSV( col["H"], col["S"], col["V"]) 
 
@@ -448,7 +447,7 @@ class ColdToWarmPalette(DockWidget):
 
     def generateMixerColor(self): 
         cm = self.color_manager
-        random.seed(datetime.now())
+        random.seed()
 
         gap_limit = 30
         gap_interval = self.settings["mix_interval"]
