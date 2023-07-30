@@ -311,12 +311,12 @@ class ColdToWarmPalette(DockWidget):
     def accessOffset(self, hue, is_cold):
         min = self.settings["hue_min"]
         max = self.settings["hue_max"]
-  
-        if(hue <= 5 or hue > 240):
-            return -1 * self.distanceFrom(240, hue, 2, max, min) if is_cold else self.distanceFrom(240, hue, 2, max, min)
+
+        if(hue <= 5 or hue > 230):
+            return -1 * self.distanceFrom(230, hue, 2, max, min) if is_cold else self.distanceFrom(230, hue, 2, max, min)
             #return -6  if is_cold else 6;  
         else:
-            return self.distanceFrom(240, hue, 2, max, min) if is_cold else -1 * self.distanceFrom(240, hue, 2, max, min) 
+            return self.distanceFrom(230, hue, 2, max, min) if is_cold else -1 * self.distanceFrom(230, hue, 2, max, min) 
             #return 6  if is_cold else -6;   
 
     def generateColorPalette(self, color = False):

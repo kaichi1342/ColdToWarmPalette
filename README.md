@@ -119,6 +119,15 @@ Interface Adjust Depending on the ratio of height and width of the button
 | 4 | Generate new Mixer Colors
 | 5 | Reset Mixer Colors
 
+### Functionalities
+
+This plugin main function are 
+1. Create a cold and warm tone palette from foreground color
+2. Mix generated palette with a color from color slot
+
+> [Cold to Warm Palette Demo Video ](https://www.youtube.com/watch?v=sCc7H0TAslQ)
+
+
 ### Plans --
 
 
