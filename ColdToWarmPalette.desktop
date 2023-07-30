@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=Krita/PythonPlugin
+X-KDE-Library=ColdToWarmPalette
+X-Python-2-Compatible=false
+X-Krita-Manual=Manual.html
+Name=Cold to Warm Palette
+Comment=Generate a palette of cool and warm tones based of a selected color and mix it another color from the mixer slot

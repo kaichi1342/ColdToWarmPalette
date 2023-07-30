@@ -1,0 +1,9 @@
+{
+    "hue_min": 8.0,
+    "hue_max": 12.0,
+    "mix_min": 9.0,
+    "mix_max": 12.0,
+    "mix_interval": 9.0,
+    "hue_strip": 5.0,
+    "sat_strip": 10.0
+}
