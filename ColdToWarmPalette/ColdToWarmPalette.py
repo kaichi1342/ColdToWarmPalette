@@ -448,7 +448,7 @@ class ColdToWarmPalette(DockWidget):
 
     def generateMixerColor(self): 
         cm = self.color_manager
-        random.seed(datetime.now())
+        random.seed()
 
         gap_limit = 30
         gap_interval = self.settings["mix_interval"]
