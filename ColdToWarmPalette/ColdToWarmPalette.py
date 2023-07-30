@@ -58,7 +58,7 @@ class ColdToWarmPalette(DockWidget):
         self.gen_color = []
         self.hue_color = []
      
-        self.connected = False
+        self.with_canvas = False
         self.useFG = True
         self.theme_signal  = False 
     
@@ -206,12 +206,14 @@ class ColdToWarmPalette(DockWidget):
     
 
     def canvasChanged(self, canvas):
-        if not canvas:
-            self.connected = False
-            return True 
-        
-        self.connected = True
-        pass
+        if canvas:       
+            if canvas.view():
+                self.with_canvas = True
+            else: 
+                self.with_canvas = False 
+
+        self.with_canvas = False
+
           
 
     #CONNECT BUTTONS
