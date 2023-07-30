@@ -80,7 +80,10 @@ Interface Adjust Depending on the ratio of height and width of the button
 | RMB | Shift Main Color to this Color
 
 
+
 4. Settings 
+> ![Interface](./screenshots/ui06.png) 
+
 > Hue Min and Hue Max
 - Hue Min and Hue Max -> Controls the gap between colors generated in the palette. 
 - Higher Hue Min and Hue Max will result in further gap between cold tone and warm tone.
@@ -97,10 +100,16 @@ Interface Adjust Depending on the ratio of height and width of the button
 
 > Saturation and Hue Strip Variance
 - Sets the variance between Saturation/Hue Strip Colors
+ 
+
+|  Keys  |  Action  | 
+| --- | ---  | 
+| LMB | Set Foreground Color to this Color
+| RMB | Shift Main Color to this Color
 
 5. Buttons 
 
-> ![Interface](./screenshots/ui06.png) 
+> ![Interface](./screenshots/ui07.png) 
 
 |  Button  |  Action  | 
 | --- | ---  | 
