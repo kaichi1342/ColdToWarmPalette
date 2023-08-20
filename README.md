@@ -165,8 +165,19 @@ if not enable it by going to Settings -> Configure Krita -> **Python Plugin Mana
 
 
 ### Release Log
- 
+
+2023-08-20  : Version 0.1.2a
+
+- Remove color variance setting from Setting Dialog
+- Added color variance slider to main dialog 
+- Added color history bar
+- Added ability to return to previous selected main color 
+- Added [Auto Change] setting to setting dialog
+- Added ability to change selected main color to current foreground color automatically via toggle in settings dialog
+- Added ability to change mixer color value to match that of main color value
+
 2023-07-30  : Version 0.1.1a
+
 - First Released Version 
 
 ### Thanks to:
