@@ -35,7 +35,7 @@ from PyQt5.QtWidgets import (
         QVBoxLayout, QHBoxLayout, QGridLayout, QSpacerItem, QSizePolicy,
         QLabel, QPushButton, QToolButton, QComboBox , QCheckBox,
         QListWidget, QLineEdit, QListWidgetItem, QMenu,
-        QMessageBox
+        QMessageBox, QSlider, QCheckBox 
 )
 
 
@@ -93,8 +93,8 @@ class SettingsDialog(QDialog):
         self.color_setting = QWidget()
         self.color_setting.setLayout(self.roll_container) 
 
-        self.label_hue_min = QLabel("Hue Min")
-        self.label_hue_max = QLabel("Hue Max")
+        #self.label_hue_min = QLabel("Hue Min")
+        #self.label_hue_max = QLabel("Hue Max")
 
         self.label_mix_min = QLabel("Mix Min")
         self.label_mix_max = QLabel("Mix Max")
@@ -103,8 +103,8 @@ class SettingsDialog(QDialog):
         self.label_hue_strip = QLabel("Hue Strip Variance")
         self.label_sat_strip = QLabel("Saturation Strip Variance")
         
-        self.dsb_hue_min    = DoubleSpinBox(2,20,1)
-        self.dsb_hue_max    = DoubleSpinBox(2,20,1)
+        #self.dsb_hue_min    = DoubleSpinBox(2,20,1)
+        #self.dsb_hue_max    = DoubleSpinBox(2,20,1)
         
         self.dsb_mix_min    = DoubleSpinBox(2,20,1)
         self.dsb_mix_max  = DoubleSpinBox(2,50,1)
@@ -114,14 +114,18 @@ class SettingsDialog(QDialog):
         self.dsb_hue_strip  = DoubleSpinBox(2,30,1)
         self.dsb_sat_strip  = DoubleSpinBox(2,30,1)
         
+        
+        self.label_auto_change = QLabel("Auto Change Color") 
+        self.chk_auto_change     = QCheckBox()
+
         self.button_ok      = QPushButton("&Save")
         self.button_cancel  = QPushButton("&Cancel") 
 
-        self.roll_container.addWidget(self.label_hue_min, 0, 0, 1, 2)
-        self.roll_container.addWidget(self.dsb_hue_min, 0, 2, 1, 2)
+        #self.roll_container.addWidget(self.label_hue_min, 0, 0, 1, 2)
+        #self.roll_container.addWidget(self.dsb_hue_min, 0, 2, 1, 2)
 
-        self.roll_container.addWidget(self.label_hue_max, 0, 4, 1, 2)
-        self.roll_container.addWidget(self.dsb_hue_max, 0, 6, 1, 2)
+        #self.roll_container.addWidget(self.label_hue_max, 0, 4, 1, 2)
+        #self.roll_container.addWidget(self.dsb_hue_max, 0, 6, 1, 2)
 
 
         self.roll_container.addWidget(self.label_mix_min, 1, 0, 1, 2)
@@ -141,27 +145,39 @@ class SettingsDialog(QDialog):
         self.roll_container.addWidget(self.dsb_sat_strip, 4, 4, 1, 4)
 
 
-        self.roll_container.addWidget(self.button_ok, 5, 0, 1, 4)
-        self.roll_container.addWidget(self.button_cancel, 5, 4, 1, 4)
+        self.roll_container.addWidget(self.label_auto_change, 5, 0, 1, 4)
+        self.roll_container.addWidget(self.chk_auto_change, 5, 4, 1, 4)
+
+
+        self.roll_container.addWidget(self.button_ok, 6, 0, 1, 4)
+        self.roll_container.addWidget(self.button_cancel, 6, 4, 1, 4)
 
         self.general_container.addWidget(self.color_setting)   
 
+        self.dsb_mix_min.setToolTip("Set the minimum gap in hues between generate mixer color.")
+        self.dsb_mix_max.setToolTip("Set the maximum gap in hues between generate mixer color.")
 
+        self.dsb_mix_interval.setToolTip("Set the maximum possible step from current color to target color in mix.")
+
+        self.dsb_hue_strip.setToolTip("Set color variance of generated color in hue strip.")
+        self.dsb_sat_strip.setToolTip("Set color variance of generated color in saturation strip.")
         
+        self.chk_auto_change.setToolTip("Toggles On/Off: Auto Generate Palette when selected color change.")
+
     def loadDefault(self): 
 
-        self.dsb_hue_min.setValue(self.evalSettingValue(self.settings["hue_min"], 4, 20))
-        self.dsb_hue_max.setValue(self.evalSettingValue(self.settings["hue_max"], 4, 20))
+        #self.dsb_hue_min.setValue(self.evalSettingValue(self.settings["hue_min"], 4, 20))
+        #self.dsb_hue_max.setValue(self.evalSettingValue(self.settings["hue_max"], 4, 20))
 
         
         self.dsb_mix_min.setValue(self.evalSettingValue(self.settings["mix_min"], 11, 20))
         self.dsb_mix_max.setValue(self.evalSettingValue(self.settings["mix_max"], 30, 50))
         self.dsb_mix_interval.setValue(self.evalSettingValue(self.settings["mix_interval"], 9, 30))
 
-
         self.dsb_hue_strip.setValue(self.evalSettingValue(self.settings["hue_strip"], 5, 30))
         self.dsb_sat_strip.setValue(self.evalSettingValue(self.settings["sat_strip"], 5, 30))
 
+        self.chk_auto_change.setChecked(self.settings["auto_change"])
         pass
 
     
@@ -187,10 +203,11 @@ class SettingsDialog(QDialog):
     def cancelSave(self):  
         self.done(0)
 
-    def saveSettings(self):   
-        if( self.dsb_hue_max.value() >=  self.dsb_hue_min.value()):
-            self.settings["hue_max"]    = self.dsb_hue_max.value()
-            self.settings["hue_min"]    = self.dsb_hue_min.value()
+    def saveSettings(self):    
+            
+        #if( self.dsb_hue_max.value() >=  self.dsb_hue_min.value()):
+        #    self.settings["hue_max"]    = self.dsb_hue_max.value()
+        #    self.settings["hue_min"]    = self.dsb_hue_min.value()
        
         if(self.dsb_mix_max.value() >= self.dsb_mix_min.value()):
             self.settings["mix_min"]  = self.dsb_mix_min.value()
@@ -198,15 +215,16 @@ class SettingsDialog(QDialog):
 
         self.settings["mix_interval"]   = self.dsb_mix_interval.value()
 
-        self.settings["hue_strip"]  = self.dsb_hue_strip.value()
+        self.settings["hue_strip"]   = self.dsb_hue_strip.value()
         self.settings["sat_strip"]   = self.dsb_sat_strip.value()
 
-         
+        self.settings["auto_change"] = self.chk_auto_change.isChecked()
+
         json_setting = json.dumps(self.settings, indent = 4)
     
         with open(os.path.dirname(os.path.realpath(__file__)) + '/settings.json', "w") as outfile:
             outfile.write(json_setting)
         
         self.loadSettings() 
-        self.parent().loadSettings()
+        self.parent().reloadSettings()
         self.done(0)
