@@ -22,6 +22,10 @@
     
   
  
+from asyncio.windows_events import NULL
+from operator import truediv
+from pickle import FALSE
+from xml.etree.ElementTree import TreeBuilder
 from krita import *
 import  math, os, random, json
 from functools import partial
@@ -34,7 +38,7 @@ from PyQt5.QtWidgets import (
     QApplication,
     QVBoxLayout,  QGridLayout,  QHBoxLayout, 
     QPushButton, QWidget, QLabel, QComboBox,
-    QToolButton, QDesktopWidget  
+    QToolButton, QDesktopWidget , QSlider 
 )
 
 from .CWP_ColorManager import *  
@@ -50,22 +54,38 @@ class ColdToWarmPalette(DockWidget):
         super().__init__()
         self.setWindowTitle("Cold To Warm Palette")  
       
+        self.settings =  {
+            "hue_min": 2.0,
+            "hue_max": 4.0,
+            "mix_min": 10.0,
+            "mix_max": 15.0,
+            "mix_interval": 5.0,
+            "hue_strip": 5.0,
+            "sat_strip": 10.0,
+            "auto_change" : False
+        }
+
         self.loadSettings() 
        
         self.mixer_color = []
         self.sat_color = []
         self.gen_color = []
         self.hue_color = []
-     
+        
+        self.color_history = []
+        self.undo_stack = []
+        self.last_color = NULL
+        
         self.with_canvas = False
         self.useFG = True
         self.theme_signal  = False 
     
         self.target_color = False
-
         self.color_manager = ColorGenerator(self)   
         
         self.setting_dialog = None
+
+        self.history_bar_count = 10
 
         self.setUI()
         self.connectButtons()
@@ -75,12 +95,11 @@ class ColdToWarmPalette(DockWidget):
     def loadSettings(self):
         self.json_setting = open(os.path.dirname(os.path.realpath(__file__)) + '/settings.json')
         self.settings = json.load(self.json_setting)
-        self.json_setting.close() 
+        self.json_setting.close()  
  
     def reloadSettings(self):
-        self.json_setting = open(os.path.dirname(os.path.realpath(__file__)) + '/settings.json')
-        self.settings = json.load(self.json_setting)
-        self.json_setting.close() 
+        self.loadSettings() 
+        self.toggleTimer()
 
     def setUI(self):
         self.base_widget = QWidget()
@@ -159,9 +178,33 @@ class ColdToWarmPalette(DockWidget):
         self.colorbox_container.addWidget(self.mid_colorbox, 0, 1, 1, 6) 
         self.colorbox_container.addWidget(self.right_colorbox, 0, 7, 1, 1) 
 
+        # -------------- #
+        #  COLOR HISTORY #
+        # -------------- #
+        
+
+        #BOTTOM COLOR BOX  
+        self.bottom_colorbox             = QWidget()
+        self.bottom_colorbox_container   = QHBoxLayout()
+        self.bottom_colorbox.setLayout(self.bottom_colorbox_container)
+        self.bottom_colorbox.setContentsMargins(0, 0, 0, 0) 
+        self.bottom_colorbox_container.setContentsMargins(2, 2, 2, 2) 
+
+        for c in range(0, self.history_bar_count): #12
+            self.color_history.append(ColorBox()) 
+            self.bottom_colorbox_container.addWidget(self.color_history[c])
+
+
         # ------------ #
         # TOOL BUTTON  #
         # ------------ #
+
+        self.color_variance     = QSlider(Qt.Horizontal)
+        
+        self.color_variance.setRange(2,30)  
+        self.color_variance.setTickPosition(QSlider.NoTicks)
+        self.color_variance.setTickInterval(1)
+        self.color_variance.setValue(self.settings["hue_max"])
 
         self.toolbox             = QWidget()
         self.toolbox_container   = QGridLayout()
@@ -174,44 +217,79 @@ class ColdToWarmPalette(DockWidget):
         self.btn_reset_mixer =  QToolButton() 
         self.btn_reset_mixer.setIcon( Krita.instance().icon("reload-preset") ) 
 
+        self.btn_mixer_to_value =  QToolButton() 
+        self.btn_mixer_to_value.setIcon( Krita.instance().icon("showColoring") )    
+
         self.btn_generate_palette=  QToolButton() 
         self.btn_generate_palette.setIcon( Krita.instance().icon("animation_play") )  
 
         self.btn_fgbg_toggle =  QToolButton() 
         self.btn_fgbg_toggle.setIcon( Krita.instance().icon("object-order-lower-calligra") )   #object-order-raise-calligra
+        
+        self.btn_undo_main_color =  QToolButton() 
+        self.btn_undo_main_color.setIcon( Krita.instance().icon("edit-undo") )  
 
         self.btn_configure =  QToolButton() 
         self.btn_configure.setIcon( Krita.instance().icon("configure-shortcuts") )     
 
-        self.toolbox_container.addWidget(self.btn_reset_mixer, 0, 0 , 1, 1)  
-        self.toolbox_container.addWidget(self.btn_generate_mixer, 0, 1 , 1, 1)  
-        self.toolbox_container.addWidget(self.btn_generate_palette, 0, 2 , 1, 1)  
-        self.toolbox_container.addWidget(self.btn_fgbg_toggle, 0, 3 , 1, 1)  
-        self.toolbox_container.addWidget(self.btn_configure, 0, 4 , 1, 1)  
+
+
+        self.color_variance.setToolTip("Change gaps betwen column of generated colors.")
+
+        self.color_variance.setToolTip("Change gaps betwen column of generated colors.")
+
+        self.btn_reset_mixer.setToolTip("Reset mixer colors.")
+        self.btn_generate_mixer.setToolTip("Generate mixer colors.")
+        self.btn_mixer_to_value.setToolTip("Match value of mixer color to the value of main color.")
+
+        self.btn_generate_palette.setToolTip("Generate cold to warm palette base on selected color.")
+        self.btn_fgbg_toggle.setToolTip("Switch Foreground and Background Color to use in generating palettes.")
+        self.btn_undo_main_color.setToolTip("Undo main color to previous color.")
+
+        self.btn_configure.setToolTip("Configure settings.")
+
+
+        self.toolbox_container.addWidget(self.color_variance, 0, 0 , 1, 7)  
+
+        self.toolbox_container.addWidget(self.btn_reset_mixer, 1, 0 , 1, 1)  
+        self.toolbox_container.addWidget(self.btn_generate_mixer, 1, 1 , 1, 1)  
+        self.toolbox_container.addWidget(self.btn_mixer_to_value, 1, 2 , 1, 1)  
+        self.toolbox_container.addWidget(self.btn_generate_palette, 1, 3 , 1, 1)  
+        self.toolbox_container.addWidget(self.btn_fgbg_toggle, 1, 4 , 1, 1)  
+        self.toolbox_container.addWidget(self.btn_undo_main_color, 1, 5 , 1, 1)  
+        self.toolbox_container.addWidget(self.btn_configure, 1, 6 , 1, 1)  
 
         # -------------- #
         # MAIN CONTAINER #
         # -------------- #
 
-        #self.timer     = QTimer()
-        #self.msg      = QLabel("test") 
+        self.timer = QTimer()
+        self.timer.setInterval(500)
+        
+        
 
         #ADD TO MAIN CONTAINER
         self.main_container.addWidget(self.upper_colorbox, 0, 0, 1, 1) 
         self.main_container.addWidget(self.colorbox, 1, 0, 5, 1)  
-        self.main_container.addWidget(self.toolbox, 6, 0, 1, 1)  
-
-        #self.main_container.addWidget(self.msg, 7, 0, 1, 1)  
+        self.main_container.addWidget(self.bottom_colorbox, 6, 0, 1, 1)  
+        self.main_container.addWidget(self.toolbox, 7, 0, 1, 1)  
+        
+         
+        
+        
+        #self.msg      = QLabel("test") 
+        #self.main_container.addWidget(self.msg, 8, 0, 1, 1)  
     
 
     def canvasChanged(self, canvas):
         if canvas:       
             if canvas.view():
-                self.with_canvas = True
+                self.with_canvas = True 
+                self.toggleTimer()
             else: 
                 self.with_canvas = False 
-
-        self.with_canvas = False
+        else: 
+            self.with_canvas = False
 
           
 
@@ -219,10 +297,15 @@ class ColdToWarmPalette(DockWidget):
     def connectButtons(self): 
         self.btn_generate_palette.clicked.connect(self.generateColorPalette)
         self.btn_fgbg_toggle.clicked.connect(self.toggleFGBG) 
+        self.btn_mixer_to_value.clicked.connect(self.mixerToValue) 
         
+        self.color_variance.sliderReleased.connect(self.changeVariance) 
+
         self.btn_generate_mixer.clicked.connect(self.generateMixerColor) 
         self.btn_reset_mixer.clicked.connect(self.loadMixer) 
-        self.btn_configure.clicked.connect(self.openSetting) 
+        self.btn_configure.clicked.connect(self.openSetting)  
+        self.btn_undo_main_color.clicked.connect(self.undoMainColor)  
+        self.timer.timeout.connect(self.generateColorPalette)
         
         pass
 
@@ -244,6 +327,10 @@ class ColdToWarmPalette(DockWidget):
         for color in self.mixer_color:
             color.clicked.connect(partial(self.mixColor, color ))
             color.rightclicked.connect(partial(self.setMixerSlot, color )) 
+        
+        for color in self.color_history:
+            color.clicked.connect(partial(self.setFGColor, color ))
+            color.rightclicked.connect(partial(self.setMainToThisColor, color )) 
 
 
     def disconnectColorGrid(self):
@@ -257,10 +344,28 @@ class ColdToWarmPalette(DockWidget):
         for color in self.mixer_color:
             color.disconnect()
 
-        self.timer.timeout.disconnect 
+ 
+    def toggleTimer(self):
+        if self.with_canvas == False: 
+            return True 
 
+        if self.settings["auto_change"] == True: 
+            if self.timer.isActive() == False :
+                self.timer.start()
+            return True
+        
+        if self.timer.isActive() == True : 
+            self.timer.stop()
+        
+        return True 
+
+    #----------------------------------#
+    #  COLOR RELATION ACTION           #
+    #----------------------------------#
 
     def toggleFGBG(self):
+        if(self.with_canvas == False): return False
+
         if self.useFG == True:
             self.btn_fgbg_toggle.setIcon(Krita.instance().icon("object-order-raise-calligra")) 
             self.useFG = False
@@ -271,11 +376,15 @@ class ColdToWarmPalette(DockWidget):
         self.generateColorPalette()
         pass
 
-    def setFGColor(self, color_box):   
+    def setFGColor(self, color_box): 
+        if(self.with_canvas == False): return False
+
         color_to_set = color_box.getColorForSet(Krita.instance().activeDocument())
         Krita.instance().activeWindow().activeView().setForeGroundColor(color_to_set)
              
-    def setBGColor(self, color_box):   
+    def setBGColor(self, color_box):  
+        if(self.with_canvas == False): return False
+
         color_to_set = color_box.getColorForSet(Krita.instance().activeDocument())
         Krita.instance().activeWindow().activeView().setBackGroundColor(color_to_set)     
         
@@ -292,6 +401,28 @@ class ColdToWarmPalette(DockWidget):
         FG = colmgr.getFGColor(Krita.instance().activeWindow().activeView(), Krita.instance().activeDocument())
         return { "hue" : FG.hsvHue(), "sat" : FG.hsvSaturation(), "val" : FG.value() }
 
+    def changeVariance(self):
+        if(self.with_canvas == False): return False
+
+        self.settings["hue_max"] = self.color_variance.value()  
+        self.settings["hue_min"] = 2 if self.color_variance.value() - 5 < 2 else   self.color_variance.value() - 5
+
+        json_setting = json.dumps(self.settings, indent = 4)
+    
+        with open(os.path.dirname(os.path.realpath(__file__)) + '/settings.json', "w") as outfile:
+            outfile.write(json_setting)
+        
+        self.loadSettings() 
+
+        col =   self.gen_color[2][2].toHSV() 
+        self.generateColorPalette({"hue" : col["H"], "sat" : col["S"], "val" : col["V"]},  True)
+        
+         
+
+    #----------------------------------#
+    #  HSV CALCULATIONS                #
+    #----------------------------------#
+
     def distanceFrom(self, end, start, div = 1, max = 20, min = 2, is_val = False):
         distance = abs(end - start)
         
@@ -306,31 +437,45 @@ class ColdToWarmPalette(DockWidget):
 
         return distance
  
-
     def accessOffset(self, hue, is_cold):
         min = self.settings["hue_min"]
         max = self.settings["hue_max"]
 
-        if(hue <= 5 or hue > 230):
-            return -1 * self.distanceFrom(230, hue, 2, max, min) if is_cold else self.distanceFrom(230, hue, 2, max, min)
-            #return -6  if is_cold else 6;  
+        color_max = 180  #The Hue where the side for cold and warm will switch
+
+        if(hue <= 5 or hue > color_max):
+            return -1 * self.distanceFrom(color_max, hue, 2, max, min) if is_cold else self.distanceFrom(color_max, hue, 2, max, min) 
         else:
-            return self.distanceFrom(230, hue, 2, max, min) if is_cold else -1 * self.distanceFrom(230, hue, 2, max, min) 
-            #return 6  if is_cold else -6;   
+            return self.distanceFrom(color_max, hue, 2, max, min) if is_cold else -1 * self.distanceFrom(color_max, hue, 2, max, min)  
 
+
+    #----------------------------------#
+    #  GENERATE PALETTE                #
+    #----------------------------------#
+
+    def setMainToThisColor(self, color): 
+        if(self.with_canvas == False): return False
+        col =  color.toHSV() 
+
+        if(self.settings["auto_change"]):
+            self.generateColorPalette()
+        else:
+            self.generateColorPalette({"hue" : col["H"], "sat" : col["S"], "val" : col["V"]})
+            
     def generateColorPalette(self, color = False):
-        cm = self.color_manager
-        hsv = color if(color) else self.getHSV(self.color_manager)  
+        if(self.with_canvas == False): return False
 
-        #[2,2] is center grid / MAIN COLOR
+        cm = self.color_manager
+        hsv = color if color else self.getHSV(self.color_manager)   
+
+        #[2,2] is center grid / MAIN COLOR  
         self.gen_color[2][2].setBorder(1)
         self.hue_color[2].setBorder(1)
         self.sat_color[2].setBorder(1)
 
         self.gen_color[2][2].setColorHSV( hsv["hue"], hsv["sat"], hsv["val"])  
-        
-        #center column
 
+        #center column 
         frLight = abs(self.distanceFrom(255, hsv["val"],2, 30, 2, True))
         frDark  = abs(self.distanceFrom(0, hsv["val"],2, 20, 2, True))
 
@@ -339,13 +484,17 @@ class ColdToWarmPalette(DockWidget):
         self.gen_color[3][2].setColorHSV( hsv["hue"], hsv["sat"], cm.setCappedVal(hsv["val"], -1 * frDark) ) 
         self.gen_color[4][2].setColorHSV( hsv["hue"], hsv["sat"], cm.setCappedVal(hsv["val"], -1 * frDark * 2) ) 
 
+        #center left and right column 
         self.generateCold(hsv, frLight, frDark)
         self.generateWarm(hsv, frLight, frDark)
 
+        #side strip
         self.generateSatStrip()
         self.generateHueStrip()
-             
- 
+        
+        self.addToColorHistory(hsv)
+
+        
 
     def generateCold(self, hsv, frLight, frDark):
         cm = self.color_manager 
@@ -354,7 +503,7 @@ class ColdToWarmPalette(DockWidget):
 
         mul  = 2 
         for r in range (0,2):
-            h_offset = offset * mul
+            h_offset = int(offset * mul)
             self.gen_color[0][r].setColorHSV( cm.setHue(hsv["hue"], h_offset) , hsv["sat"], cm.setCappedVal(hsv["val"], frLight * 2) ) 
             self.gen_color[1][r].setColorHSV( cm.setHue(hsv["hue"], h_offset) , hsv["sat"], cm.setCappedVal(hsv["val"], frLight  ) )
             self.gen_color[2][r].setColorHSV( cm.setHue(hsv["hue"], h_offset) , hsv["sat"], hsv["val"])  
@@ -363,8 +512,6 @@ class ColdToWarmPalette(DockWidget):
             mul = mul - 1
 
         
-
-
     def generateWarm(self, hsv, frLight, frDark): 
         cm = self.color_manager
 
@@ -372,7 +519,7 @@ class ColdToWarmPalette(DockWidget):
 
         mul  = 1
         for r in range (3,5): 
-            h_offset = offset * mul
+            h_offset = int(offset * mul)
             self.gen_color[0][r].setColorHSV( cm.setHue(hsv["hue"], h_offset) , hsv["sat"], cm.setCappedVal(hsv["val"], frLight * 2) ) 
             self.gen_color[1][r].setColorHSV( cm.setHue(hsv["hue"], h_offset) , hsv["sat"], cm.setCappedVal(hsv["val"], frLight  ) ) 
             self.gen_color[2][r].setColorHSV( cm.setHue(hsv["hue"], h_offset) , hsv["sat"], hsv["val"])  
@@ -380,7 +527,6 @@ class ColdToWarmPalette(DockWidget):
             self.gen_color[4][r].setColorHSV( cm.setHue(hsv["hue"], h_offset) , hsv["sat"], cm.setCappedVal(hsv["val"], -1 * frDark * 2) )  
             mul = mul + 1
   
- 
     
     def generateSatStrip(self):
         cm = self.color_manager
@@ -406,6 +552,7 @@ class ColdToWarmPalette(DockWidget):
         col =  self.gen_color[4][2].toHSV()
         self.sat_color[4].setColorHSV( col["H"], cm.setCappedSat(col["S"], -1 * random.randint(rng["min"], rng["max"])),  col["V"])
 
+
     def generateHueStrip(self):
         cm = self.color_manager
 
@@ -421,7 +568,6 @@ class ColdToWarmPalette(DockWidget):
         col =  self.gen_color[3][2].toHSV()
         self.hue_color[3].setColorHSV( cm.setHue(col["H"], -1 * random.randint(rng["min"], rng["max"])) , col["S"],  col["V"])
  
-
         rng["min"] = rng["max"] + self.settings["hue_strip"]
         rng["max"] = rng["min"] + self.settings["hue_strip"]
 
@@ -431,21 +577,119 @@ class ColdToWarmPalette(DockWidget):
         col =  self.gen_color[4][2].toHSV()
         self.hue_color[4].setColorHSV( cm.setHue(col["H"], random.randint(rng["min"], rng["max"])) , col["S"],  col["V"])
 
-    def setMainToThisColor(self, color): 
-        col =  color.toHSV() 
-        self.generateColorPalette({"hue" : col["H"], "sat" : col["S"], "val" : col["V"]})
+        
+    
+    #----------------------------------#
+    #  Undo and Redo                   #
+    #----------------------------------#
+
+    def undoMainColor(self):
+        if(self.with_canvas == False): return False
+
+        if len(self.undo_stack) == 0: return True
+
+        self.undo_stack.pop()
+
+        color = ColorBox()
+
+        if(self.settings["auto_change"]):          
+            color = self.undo_stack.pop() if len(self.undo_stack) > 0 else None
+        else:
+            color = ColorBox()
+            color = self.undo_stack[len(self.undo_stack) - 1] if len(self.undo_stack) > 0 else None
+
+        if(color == None):
+            self.color_history[0].setColorHSV(0,0,200)   
+            return True
+ 
+        last_colors = self.undo_stack if len(self.undo_stack) <= self.history_bar_count else self.undo_stack[-self.history_bar_count:] 
+        last_count  = len(last_colors) - 1 if len(last_colors) - 1 >= 0 else 0
+        
+        for c in range(0, len(self.color_history) ):
+            if c > last_count:
+                self.color_history[c].setColorHSV(0,0,200)   
+                continue
+             
+        if(self.settings["auto_change"]):   
+            self.setFGColor(color)  
+        else:
+            to_load =  color.toHSV() 
+            self.generateColorPalette({"hue" : to_load["H"], "sat" : to_load["S"], "val" : to_load["V"]})
+
+
+    def loadToColorHistoryBar(self):
+        if len(self.undo_stack) <= len(self.color_history): 
+            col =  self.undo_stack[len(self.undo_stack) - 1].toHSV()
+            self.color_history[ len(self.undo_stack) - 1].setColorHSV(col["H"], col["S"], col["V"])
+             
+            
+            return True
+        
+        for c in range(1, len(self.color_history) ):
+            col =  self.color_history[c].toHSV() 
+            self.color_history[c-1].setColorHSV(col["H"], col["S"], col["V"])  
+
+        self.color_history[len(self.color_history) - 1].setColorHSV(0,0,200)  
+        
+        col =  self.undo_stack[len(self.undo_stack) - 1].toHSV()
+        self.color_history[ len(self.color_history) - 1].setColorHSV(col["H"], col["S"], col["V"])
+
+        return True
+           
+    def addToColorHistory(self, hsv):
+        if len(self.undo_stack) >= 50:
+            self.undo_stack.pop(0) 
+
+        color = ColorBox()
+        color.setColorHSV(hsv["hue"], hsv["sat"], hsv["val"])
+
+        if len(self.undo_stack) == 0:
+            self.undo_stack.append(color)
+            self.loadToColorHistoryBar()   
+            return True
+     
+        if self.compareColor(color,  self.undo_stack[len(self.undo_stack) - 1]) == True: 
+            return True
+         
+        self.undo_stack.append(color)
+        self.loadToColorHistoryBar()  
+        
+
+    def compareColor(self, color1, color2):
+        if color1 == NULL and color2 == NULL:
+            return True
+
+        if color1 == NULL or color2 == NULL:
+            return False
+  
+        if(color1.color == color2.color):
+            return True 
+
+        return False
+
+        
 
     #----------------#
     # COLOR MIXING   #
     #----------------#
     
-    def loadMixer(self):
+    def loadMixer(self): 
         hue = 0
         for mixer in self.mixer_color:
             mixer.setColorHSV(hue,255,255)
             hue += 30
 
+    def mixerToValue(self):
+        if(self.with_canvas == False): return False
+
+        main  = self.gen_color[2][2].toHSV() 
+        for mixer in self.mixer_color:
+            color = mixer.toHSV()
+            mixer.setColorHSV(color["H"],color["S"],main["V"]) 
+
     def generateMixerColor(self): 
+        if(self.with_canvas == False): return False
+
         cm = self.color_manager
         random.seed()
 
@@ -492,24 +736,27 @@ class ColdToWarmPalette(DockWidget):
 
         pass
       
+
     #---------------------------------#
     # MIXER                           #
     #---------------------------------#
     def mixColor(self, target_color):
+        if(self.with_canvas == False): return False
         cm = self.color_manager
         current  = self.gen_color[2][2].toHSV() #self.getFG( cm ) 
         target   = target_color.toHSV()
 
         next_hue = self.calcNextHue(target["H"], current["H"])
-
         next_sat =  self.calcNextSatVal(target["S"], current["S"])
         next_val =  self.calcNextSatVal(target["V"], current["V"], False)
-
-        #new_color = ColorBox()
-        #new_color.setColorHSV( next_hue, next_sat, next_val)  
-        #self.setFGColor( new_color )
         
-        self.generateColorPalette({"hue" : next_hue, "sat" : next_sat, "val" : next_val})
+        if(self.settings["auto_change"] == False):
+            self.generateColorPalette({"hue" : next_hue, "sat" : next_sat, "val" : next_val})
+            return True
+        
+        color = ColorBox()
+        color.setColorHSV(next_hue, next_sat, next_val)
+        self.setFGColor(color)  
 
 
     def calcNextHue(self, target, current): 
@@ -534,7 +781,6 @@ class ColdToWarmPalette(DockWidget):
             
     
         
-
     def calcNextSatVal(self, target, current, is_sat = True):
         current = current if current >= 0 else 0
         target  = target if target >= 0 else 0
@@ -553,18 +799,22 @@ class ColdToWarmPalette(DockWidget):
 
     
     def setMixerSlot(self, color): 
+        if(self.with_canvas == False): return False
+
         hsv   = self.getFG(self.color_manager ) 
         c_hsv = color.toHSV()
 
         if(hsv["hue"] != c_hsv["H"] or hsv["sat"] != c_hsv["S"] or hsv["val"] != c_hsv["V"]):
             color.setColorHSV( hsv["hue"], hsv["sat"], hsv["val"]) 
+    
+
 
     #---------------------------------#
     # Settings Dialog                 #
     #---------------------------------#
-           
     
     def openSetting(self):
+        if(self.with_canvas == False): return False
         if self.setting_dialog == None:
             self.setting_dialog = SettingsDialog(self, "Settings")
             self.setting_dialog.show() 

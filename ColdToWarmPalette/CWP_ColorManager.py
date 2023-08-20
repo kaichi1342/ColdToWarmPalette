@@ -42,6 +42,7 @@ class ColorBox(QWidget):
         self.border = 0
         super().__init__() 
  
+ 
     def paintEvent(self, e):
         self.qp = QPainter()
          
@@ -78,6 +79,10 @@ class ColorBox(QWidget):
         self.color.setHsv(h,s,v,255)
         self.update()
 
+    def setColorHSVF(self,h,s,v):
+        self.color.setHsvF(h,s,v,255)
+        self.update()
+
     def setColorRGBF(self,r,g,b,a = 1.0):
         self.color.setRgbF(r, g, b, a)
         self.update()
@@ -106,6 +111,9 @@ class ColorBox(QWidget):
     def toHSV(self):
         return { "H" : self.color.hsvHue(), "S" : self.color.hsvSaturation(), "V" : self.color.value()}
 
+    def toHSVF(self):
+        return { "H" : self.color.hsvHueF(), "S" : self.color.hsvSaturationF(), "V" : self.color.valueF()}
+
     def getHueName(self):
         hue = self.color.hsvHue()
         if hue >= 0     and hue <= 5        : return "red"
@@ -131,6 +139,7 @@ class ColorBox(QWidget):
             event.pos() in self.rect()):
                 self.clicked.emit()  
         self.pressPos = None
+ 
 
 class ColorGenerator():  
 

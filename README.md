@@ -68,7 +68,7 @@ Interface Adjust Depending on the ratio of height and width of the button
 | RMB | Shift Main Color to this Color
 
 
-3. Saturation Strip
+4. Saturation Strip
 
 > Contains variation of Saturation based off the main color  
 
@@ -79,16 +79,21 @@ Interface Adjust Depending on the ratio of height and width of the button
 | LMB | Set Foreground Color to this Color
 | RMB | Shift Main Color to this Color
 
+5. Color History 
+ 
+> Contains previously selected main colors
+
+> ![Interface](./screenshots/ui08.png)  
+
+|  Keys  |  Action  | 
+| --- | ---  | 
+| LMB | Set Foreground Color to this Color
+| RMB | Shift Main Color to this Color
 
 
-4. Settings 
+6. Settings 
 > ![Interface](./screenshots/ui06.png) 
-
-> Hue Min and Hue Max
-- Hue Min and Hue Max -> Controls the gap between colors generated in the palette. 
-- Higher Hue Min and Hue Max will result in further gap between cold tone and warm tone.
-- Wider gap between Min and Max will result to wider variance in color
-
+ 
 > Mix Min and Mix Max 
 - Govern the interval between Main Color to Mixer Color 
 - Same Value for Mix and Max will make it fix interval from one color to another 
@@ -107,18 +112,20 @@ Interface Adjust Depending on the ratio of height and width of the button
 | LMB | Set Foreground Color to this Color
 | RMB | Shift Main Color to this Color
 
-5. Buttons 
+7. Slider and Buttons 
 
 > ![Interface](./screenshots/ui07.png) 
 
-|  Button  |  Action  | 
-| --- | ---  | 
-| 1 | Generate Cold to Warm Palette based off of foreground color
-| 2 | Switch foreground and background color
-| 3 | Open Settings Dialog
-| 4 | Generate new Mixer Colors
-| 5 | Reset Mixer Colors
-
+|  Button  |  Name | Action  | 
+| --- | ---  | --- |
+| 1 | Color Variance Slider | Controls the gap between colors generated in the palette.  
+| 2 | Reset Mixer           | Reset colors in mixer bar to default mixer colors.
+| 3 | Generate Mixer        | Generate NEW set of mixer colors.
+| 4 | Mixer to Value        | Match the color value of mixer colors to that of the main color.
+| 5 | Generate Palette      | Generate Cold to Warm Palette based off of foreground color
+| 6 | Switch FG/BG          | Switch foreground and background color
+| 7 | Undo                  | Undo Main Color / select previous main color
+| 8 | Settings              | Open Settings Dialog 
 ### Functionalities
 
 This plugin main function are 
@@ -158,8 +165,19 @@ if not enable it by going to Settings -> Configure Krita -> **Python Plugin Mana
 
 
 ### Release Log
- 
+
+2023-08-20  : Version 0.1.2a
+
+- Remove color variance setting from Setting Dialog
+- Added color variance slider to main dialog 
+- Added color history bar
+- Added ability to return to previous selected main color 
+- Added [Auto Change] setting to setting dialog
+- Added ability to change selected main color to current foreground color automatically via toggle in settings dialog
+- Added ability to change mixer color value to match that of main color value
+
 2023-07-30  : Version 0.1.1a
+
 - First Released Version 
 
 ### Thanks to:
