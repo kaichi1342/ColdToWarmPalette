@@ -145,7 +145,7 @@ This plugin main function are
 ## Downloads - Install - Execute 
 
 ### Download
-- **[ZIP](https://github.com/kaichi1342/ColdToWarmPalette/archive/refs/heads/v.0.1.1a.zip)**
+- **[ZIP](https://github.com/kaichi1342/ColdToWarmPalette/archive/refs/heads/v.0.1.2a.zip)**
 - **[Source](https://github.com/kaichi1342/ColdToWarmPalette)**
 
 ### Install
