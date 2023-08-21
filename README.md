@@ -145,7 +145,7 @@ This plugin main function are
 ## Downloads - Install - Execute 
 
 ### Download
-- **[ZIP](https://github.com/kaichi1342/ColdToWarmPalette/archive/refs/heads/v.0.1.2a.zip)**
+- **[ZIP](https://github.com/kaichi1342/ColdToWarmPalette/archive/refs/heads/v.0.1.2b.zip)**
 - **[Source](https://github.com/kaichi1342/ColdToWarmPalette)**
 
 ### Install
@@ -166,6 +166,10 @@ if not enable it by going to Settings -> Configure Krita -> **Python Plugin Mana
 
 
 ### Release Log
+
+2023-08-21  : Version 0.1.2b
+
+- Quick Bug Fix Version on Red Color Mixing
 
 2023-08-20  : Version 0.1.2a
 

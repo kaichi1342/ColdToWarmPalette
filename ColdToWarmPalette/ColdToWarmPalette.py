@@ -272,8 +272,8 @@ class ColdToWarmPalette(DockWidget):
          
         
         
-        #self.msg      = QLabel("test") 
-        #self.main_container.addWidget(self.msg, 8, 0, 1, 1)  
+       # self.msg      = QLabel("test") 
+       # self.main_container.addWidget(self.msg, 8, 0, 1, 1)  
     
 
     def canvasChanged(self, canvas):
@@ -462,7 +462,7 @@ class ColdToWarmPalette(DockWidget):
 
         cm = self.color_manager
         hsv = color if color else self.getHSV(self.color_manager)   
-
+ 
         #[2,2] is center grid / MAIN COLOR  
         self.gen_color[2][2].setBorder(1)
         self.hue_color[2].setBorder(1)
@@ -741,10 +741,12 @@ class ColdToWarmPalette(DockWidget):
         current  = self.gen_color[2][2].toHSV() #self.getFG( cm ) 
         target   = target_color.toHSV()
 
-        next_hue = self.calcNextHue(target["H"], current["H"])
+        next_hue =  self.calcNextHue(target["H"], current["H"])
         next_sat =  self.calcNextSatVal(target["S"], current["S"])
         next_val =  self.calcNextSatVal(target["V"], current["V"], False)
-        
+       
+        next_hue =  360 + next_hue if next_hue < 0 else next_hue
+
         if(self.settings["auto_change"] == False):
             self.generateColorPalette({"hue" : next_hue, "sat" : next_sat, "val" : next_val})
             return True
@@ -756,8 +758,8 @@ class ColdToWarmPalette(DockWidget):
 
     def calcNextHue(self, target, current): 
         
-        current = current if current > 0 else 360 + current
-        target  = target  if target  > 0 else 360 + target
+        current = current if current >= 0 else 360 + current
+        target  = target  if target  >= 0 else 360 + target
 
         if(current == 240): current = current - 1
         if(current == target): return target
@@ -789,9 +791,10 @@ class ColdToWarmPalette(DockWidget):
         if(gap == 0): 
             return target
          
-
+    
         return self.color_manager.setCappedSat(current, offset) if is_sat else self.color_manager.setCappedVal(current, offset) 
-
+    
+        
     
     def setMixerSlot(self, color): 
         if(self.with_canvas == False): return False
