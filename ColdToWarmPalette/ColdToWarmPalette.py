@@ -415,7 +415,7 @@ class ColdToWarmPalette(DockWidget):
         self.loadSettings() 
 
         col =   self.gen_color[2][2].toHSV() 
-        self.generateColorPalette({"hue" : col["H"], "sat" : col["S"], "val" : col["V"]},  True)
+        self.generateColorPalette({"hue" : col["H"], "sat" : col["S"], "val" : col["V"]})
         
          
 
