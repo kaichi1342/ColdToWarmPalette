@@ -161,7 +161,8 @@ if not enable it by going to Settings -> Configure Krita -> **Python Plugin Mana
 
 
 ### Tested Platforms
-- Krita 5.1 
+- Krita 5.1.5
+- Krita 5.2 beta 1
 
 
 ### Release Log
