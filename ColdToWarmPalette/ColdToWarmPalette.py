@@ -20,12 +20,7 @@
 # from the mixer slots.                                                       #
 # -----------------------------------------------------------------------------
     
-  
- 
-from asyncio.windows_events import NULL
-from operator import truediv
-from pickle import FALSE
-from xml.etree.ElementTree import TreeBuilder
+   
 from krita import *
 import  math, os, random, json
 from functools import partial
@@ -74,7 +69,7 @@ class ColdToWarmPalette(DockWidget):
         
         self.color_history = []
         self.undo_stack = []
-        self.last_color = NULL
+        self.last_color = None
         
         self.with_canvas = False
         self.useFG = True
@@ -656,10 +651,10 @@ class ColdToWarmPalette(DockWidget):
         
 
     def compareColor(self, color1, color2):
-        if color1 == NULL and color2 == NULL:
+        if color1 == None and color2 == None:
             return True
 
-        if color1 == NULL or color2 == NULL:
+        if color1 == None or color2 == None:
             return False
   
         if(color1.color == color2.color):
