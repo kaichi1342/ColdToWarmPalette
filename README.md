@@ -145,7 +145,7 @@ This plugin main function are
 ## Downloads - Install - Execute 
 
 ### Download
-- **[ZIP](https://github.com/kaichi1342/ColdToWarmPalette/archive/refs/heads/v.0.1.2b.zip)**
+- **[ZIP](https://github.com/kaichi1342/ColdToWarmPalette/archive/refs/heads/v.0.1.2c.zip)**
 - **[Source](https://github.com/kaichi1342/ColdToWarmPalette)**
 
 ### Install
@@ -158,14 +158,17 @@ This plugin main function are
 if not enable it by going to Settings -> Configure Krita -> **Python Plugin Manager** and click to check **Cold to Warm Palette**.
 5. Restart Krita.
 6. View **Cold to Warm Palette** to your screen by going to Settings -> Dockers -> **Cold to Warm Palette**
-
-
+ 
 ### Tested Platforms
 - Krita 5.1.5
 - Krita 5.2 beta 1
 
 
 ### Release Log
+
+2023-09-09  : Version 0.1.2c
+
+- Change setupColor to use MangeColor.fromQcolor
 
 2023-08-21  : Version 0.1.2b
 
