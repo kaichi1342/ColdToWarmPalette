@@ -167,6 +167,10 @@ if not enable it by going to Settings -> Configure Krita -> **Python Plugin Mana
 
 ### Release Log
 
+2023-09-09  : Version 0.1.2b
+
+- Change setupColor to use MangeColor.fromQcolor
+
 2023-08-21  : Version 0.1.2b
 
 - Quick Bug Fix Version on Red Color Mixing
