@@ -374,13 +374,13 @@ class ColdToWarmPalette(DockWidget):
     def setFGColor(self, color_box): 
         if(self.with_canvas == False): return False
 
-        color_to_set = color_box.getColorForSet(Krita.instance().activeDocument())
+        color_to_set = color_box.getColorForSet(Krita.instance().activeDocument(), Krita.instance().activeWindow().activeView().canvas() )
         Krita.instance().activeWindow().activeView().setForeGroundColor(color_to_set)
              
     def setBGColor(self, color_box):  
         if(self.with_canvas == False): return False
 
-        color_to_set = color_box.getColorForSet(Krita.instance().activeDocument())
+        color_to_set = color_box.getColorForSet(Krita.instance().activeDocument(), Krita.instance().activeWindow().activeView().canvas() )
         Krita.instance().activeWindow().activeView().setBackGroundColor(color_to_set)     
         
 
