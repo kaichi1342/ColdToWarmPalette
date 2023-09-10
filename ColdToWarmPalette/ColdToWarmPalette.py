@@ -386,14 +386,14 @@ class ColdToWarmPalette(DockWidget):
 
     def getHSV(self, colmgr):
         if(self.useFG == True):
-            FG = colmgr.getFGColor(Krita.instance().activeWindow().activeView(), Krita.instance().activeDocument())
+            FG = colmgr.getFGColor(Krita.instance().activeWindow().activeView(), Krita.instance().activeDocument(), Krita.instance().activeWindow().activeView().canvas())
             return { "hue" : FG.hsvHue(), "sat" : FG.hsvSaturation(), "val" : FG.value() }
         else: 
-            BG = colmgr.getBGColor(Krita.instance().activeWindow().activeView(), Krita.instance().activeDocument())
+            BG = colmgr.getBGColor(Krita.instance().activeWindow().activeView(), Krita.instance().activeDocument(), Krita.instance().activeWindow().activeView().canvas())
             return { "hue" : BG.hsvHue(), "sat" : BG.hsvSaturation(), "val" : BG.value() }
 
     def getFG(self, colmgr):
-        FG = colmgr.getFGColor(Krita.instance().activeWindow().activeView(), Krita.instance().activeDocument())
+        FG = colmgr.getFGColor(Krita.instance().activeWindow().activeView(), Krita.instance().activeDocument(), Krita.instance().activeWindow().activeView().canvas())
         return { "hue" : FG.hsvHue(), "sat" : FG.hsvSaturation(), "val" : FG.value() }
 
     def changeVariance(self):
