@@ -91,6 +91,16 @@ class ColdToWarmPalette(DockWidget):
         self.json_setting = open(os.path.dirname(os.path.realpath(__file__)) + '/settings.json')
         self.settings = json.load(self.json_setting)
         self.json_setting.close()  
+
+        self.settings["hue_min"] = int(math.floor(self.settings["hue_min"])) 
+        self.settings["hue_max"] = int(math.floor(self.settings["hue_max"])) 
+        self.settings["mix_min"] = int(math.floor(self.settings["mix_min"]))
+        self.settings["mix_max"] = int(math.floor(self.settings["mix_max"]))
+        self.settings["mix_interval"] = int(math.floor(self.settings["mix_interval"]))
+        self.settings["hue_strip"] = int(math.floor(self.settings["hue_strip"]))
+        self.settings["sat_strip"] = int(math.floor(self.settings["sat_strip"])) 
+ 
+ 
  
     def reloadSettings(self):
         self.loadSettings() 
@@ -436,7 +446,7 @@ class ColdToWarmPalette(DockWidget):
         min = self.settings["hue_min"]
         max = self.settings["hue_max"]
 
-        color_max = 180  #The Hue where the side for cold and warm will switch
+        color_max = 210  #The Hue where the side for cold and warm will switch
 
         if(hue <= 5 or hue > color_max):
             return -1 * self.distanceFrom(color_max, hue, 2, max, min) if is_cold else self.distanceFrom(color_max, hue, 2, max, min) 

@@ -75,6 +75,10 @@ class ColorBox(QWidget):
             return True 
         self.border = 1
 
+    def setQColor(self, color):
+        self.color = color
+        self.update()
+        
     def setColorHSV(self,h,s,v):
         self.color.setHsv(h,s,v,255)
         self.update()
@@ -136,41 +140,22 @@ class ColorBox(QWidget):
  
 
 class ColorGenerator():  
-
-    def __init__(self, parent, settings):  
+  
+    def __init__(self, parent, settings = False):  
         self.hue = 0
         self.sat = 0
         self.val = 0
 
         self.parent     = parent
-        self.settings   = settings
-        self.sat_limit  = self.settings["saturation_cutoff"]
-        self.val_limit  = self.settings["value_cutoff"] 
-        
-        super().__init__() 
-    
-    def __init__(self, parent):  
-        self.hue = 0
-        self.sat = 0
-        self.val = 0
-
-        self.settings = self.defaultSetting()
-
-        self.parent     = parent 
+        self.settings   = settings if settings else self.defaultSetting()
         self.sat_limit  = self.settings["saturation_cutoff"]
         self.val_limit  = self.settings["value_cutoff"] 
         
         super().__init__() 
  
-    def reloadSettings(self, settings):
-        self.settings   = settings
-        self.sat_limit  = self.settings["saturation_cutoff"]
-        self.val_limit  = self.settings["value_cutoff"]
-        self.sat_cutoff = self.setCutOffPoint(self.settings["saturation_priority"])
-        self.sat_cutoff = self.setCutOffPoint(self.settings["value_priority"])
-    
-    def reloadSettings(self):
-        self.settings   = self.defaultSetting()
+   
+    def reloadSettings(self, settings = False):
+        self.settings   = settings if settings else self.defaultSetting()
         self.sat_limit  = self.settings["saturation_cutoff"]
         self.val_limit  = self.settings["value_cutoff"]
         self.sat_cutoff = self.setCutOffPoint(self.settings["saturation_priority"])
@@ -182,10 +167,10 @@ class ColorGenerator():
             "saturation_priority"   : "High",
             "value_priority"        : "Normal",
             "saturation_cutoff": {
-                "low": 0,
-                "mid": 60,
+                "low" : 0,
+                "mid" : 60,
                 "high": 130,
-                "lim": 255
+                "lim" : 255
             },
             "value_cutoff": {
                 "low" : 0,
@@ -212,6 +197,7 @@ class ColorGenerator():
 
     def reloadSatCutOff(self):
         self.sat_limit = self.settings["saturation_cutoff"] 
+
     def reloadSatCutOff(self):
         self.val_limit = self.settings["value_cutoff"]
 
@@ -232,6 +218,7 @@ class ColorGenerator():
  
 
 
+    #HUE
     def setHue(self, hue = -1, offset = 0):
         if(hue < 0 ): 
             random.seed()
@@ -249,12 +236,10 @@ class ColorGenerator():
         self.sat_cutoff = self.setCutOffPoint(self.settings["saturation_priority"])
         if(sat < 0 ): 
             return self.setRandomSat()
-        else:
-            #return self.setCapToLimitSat(sat, offset, rand_offset) 
+        else: 
             return self.setRotatingSat(sat, offset, rand_offset) 
 
-    def setRandomSat(self): 
-        #random.seed()
+    def setRandomSat(self):  
         cutoff = random.randint(0, 100)
         if cutoff <= self.sat_cutoff[0]:
             return random.randint(self.sat_limit["low"],self.sat_limit["mid"])
@@ -290,8 +275,7 @@ class ColorGenerator():
         self.val_cutoff = self.setCutOffPoint(self.settings["value_priority"])
         if(val < 0 ):   
             return self.setRandomVal()
-        else:  
-            #return self.setCapToLimitVal(val, offset, rand_offset)
+        else:   
             return self.setRotatingVal(val, offset, rand_offset)
 
 
@@ -328,13 +312,15 @@ class ColorGenerator():
         else: 
             return val + offset 
 
+    #OFFSET
     def randomizedOffset(self):
         random.seed()
         if ( random.randint(1, 500) % 2 == 0 ):
             return random.randint(5,20)
         else: 
              return -1 * random.randint(5,20)
-
+    
+    #CUTOFFPOINT
     def setCutOffPoint(self, t):
         if t == "Low":
             return [90,95]

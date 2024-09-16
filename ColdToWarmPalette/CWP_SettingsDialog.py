@@ -45,10 +45,11 @@ class DoubleSpinBox(QDoubleSpinBox):
     def __init__(self):
          super(QDoubleSpinBox, self).__init__() 
     
-    def __init__(self, low = 0, high = 0, step = 0):
+    def __init__(self, low = 0, high = 0, step = 0, precision = 2):
         super(QDoubleSpinBox, self).__init__() 
         self.setRange(low, high)
         self.setSingleStep(step)
+        self.setDecimals(precision)
 
     def stepBy(self, step):
         value = self.value()
@@ -60,6 +61,10 @@ class DoubleSpinBox(QDoubleSpinBox):
         value = self.value() 
         super(DoubleSpinBox, self).focusOutEvent(e)
         self.stepChanged.emit()
+    
+    def setPrecision(self, e):
+        self.setDecimals(e)
+    
 
 class SettingsDialog(QDialog):
     def __init__(self, parent, title = "" ):
@@ -106,13 +111,13 @@ class SettingsDialog(QDialog):
         #self.dsb_hue_min    = DoubleSpinBox(2,20,1)
         #self.dsb_hue_max    = DoubleSpinBox(2,20,1)
         
-        self.dsb_mix_min    = DoubleSpinBox(2,20,1)
-        self.dsb_mix_max  = DoubleSpinBox(2,50,1)
+        self.dsb_mix_min    = DoubleSpinBox(2,20,1,0)
+        self.dsb_mix_max  = DoubleSpinBox(2,50,1,0)
 
-        self.dsb_mix_interval  = DoubleSpinBox(2,30,1)
+        self.dsb_mix_interval  = DoubleSpinBox(2,30,1,0)
 
-        self.dsb_hue_strip  = DoubleSpinBox(2,30,1)
-        self.dsb_sat_strip  = DoubleSpinBox(2,30,1)
+        self.dsb_hue_strip  = DoubleSpinBox(2,30,1,0)
+        self.dsb_sat_strip  = DoubleSpinBox(2,30,1,0)
         
         
         self.label_auto_change = QLabel("Auto Change Color") 

@@ -166,6 +166,10 @@ if not enable it by going to Settings -> Configure Krita -> **Python Plugin Mana
 
 ### Release Log
 
+2024-09-09  : Version 0.1.3
+- Fix float error in python 3.10 / 3.12
+- Change doublespinbox precision to 0 to prevent float value
+
 2023-09-09  : Version 0.1.2c
 
 - Change setupColor to use MangeColor.fromQcolor

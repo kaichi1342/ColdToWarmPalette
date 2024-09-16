@@ -1,10 +1,10 @@
 {
-    "hue_min": 8,
-    "hue_max": 13,
-    "mix_min": 11.0,
-    "mix_max": 30.0,
-    "mix_interval": 11.0,
-    "hue_strip": 5.0,
-    "sat_strip": 10.0,
-    "auto_change": false
+    "hue_min": 10,
+    "hue_max": 15,
+    "mix_min": 15,
+    "mix_max": 34,
+    "mix_interval": 13,
+    "hue_strip": 7,
+    "sat_strip": 11,
+    "auto_change": true
 }

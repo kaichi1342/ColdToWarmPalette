@@ -1,1 +1,0 @@
-from .ColdToWarmPalette import ColdToWarmPalette
