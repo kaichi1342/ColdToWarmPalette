@@ -75,6 +75,10 @@ class ColorBox(QWidget):
             return True 
         self.border = 1
 
+    def setQColor(self, color):
+        self.color = color
+        self.update()
+        
     def setColorHSV(self,h,s,v):
         self.color.setHsv(h,s,v,255)
         self.update()
@@ -232,12 +236,10 @@ class ColorGenerator():
         self.sat_cutoff = self.setCutOffPoint(self.settings["saturation_priority"])
         if(sat < 0 ): 
             return self.setRandomSat()
-        else:
-            #return self.setCapToLimitSat(sat, offset, rand_offset) 
+        else: 
             return self.setRotatingSat(sat, offset, rand_offset) 
 
-    def setRandomSat(self): 
-        #random.seed()
+    def setRandomSat(self):  
         cutoff = random.randint(0, 100)
         if cutoff <= self.sat_cutoff[0]:
             return random.randint(self.sat_limit["low"],self.sat_limit["mid"])
