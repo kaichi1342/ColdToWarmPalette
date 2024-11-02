@@ -145,7 +145,7 @@ This plugin main function are
 ## Downloads - Install - Execute 
 
 ### Download
-- **[ZIP](https://github.com/kaichi1342/ColdToWarmPalette/archive/refs/heads/v.0.1.3.zip)**
+- **[ZIP](https://github.com/kaichi1342/ColdToWarmPalette/archive/refs/heads/v.0.1.3a.zip)**
 - **[Source](https://github.com/kaichi1342/ColdToWarmPalette)**
 
 ### Install
@@ -165,6 +165,8 @@ if not enable it by going to Settings -> Configure Krita -> **Python Plugin Mana
 
 
 ### Release Log
+2024-11-02  : Version 0.1.3a
+- Fix no plugin error when importing plugin
 
 2024-09-09  : Version 0.1.3
 - Fix float error in python 3.10 / 3.12
