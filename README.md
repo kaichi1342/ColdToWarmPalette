@@ -144,9 +144,15 @@ This plugin main function are
 
 ## Downloads - Install - Execute 
 
-### Download
-- **[ZIP](https://github.com/kaichi1342/ColdToWarmPalette/archive/refs/heads/v.0.1.3a.zip)**
 - **[Source](https://github.com/kaichi1342/ColdToWarmPalette)**
+
+### Download
+
+Krita 5.2.x
+- **[V.0.1.3a - ZIP](https://github.com/kaichi1342/ColdToWarmPalette/archive/refs/heads/v.0.1.3a.zip)**
+
+Krita 6.x
+- **[V.0.1.3b - ZIP](https://github.com/kaichi1342/ColdToWarmPalette/archive/refs/heads/v.0.1.3b.zip)**
 
 ### Install
 
@@ -162,9 +168,12 @@ if not enable it by going to Settings -> Configure Krita -> **Python Plugin Mana
 ### Tested Platforms
 - Krita 5.1.5
 - Krita 5.2 beta 1
-
+- Krita 6.0 beta 2
 
 ### Release Log
+2026-02-28  : Version 0.1.3b
+- Port to PyQt6
+
 2024-11-02  : Version 0.1.3a
 - Fix no plugin error when importing plugin
 
