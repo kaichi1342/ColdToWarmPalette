@@ -25,11 +25,11 @@ from krita import *
 import random, time
 from datetime import datetime
 
-from PyQt5.QtCore import ( Qt, pyqtSignal)
+from PyQt6.QtCore import ( Qt, pyqtSignal)
 
-from PyQt5.QtGui import (QPainter, QColor, QPen, QMouseEvent)
+from PyQt6.QtGui import (QPainter, QColor, QPen, QMouseEvent)
 
-from PyQt5.QtWidgets import (QWidget, QMessageBox, QLabel)
+from PyQt6.QtWidgets import (QWidget, QMessageBox, QLabel)
  
 
 class ColorBox(QWidget):
@@ -126,14 +126,14 @@ class ColorBox(QWidget):
         else                                : return "red" 
 
     def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
             self.pressPos = event.pos() 
-        elif event.button() == Qt.RightButton: 
+        elif event.button() == Qt.MouseButton.RightButton: 
             self.rightclicked.emit()  
 
     def mouseReleaseEvent(self, event):
         if (self.pressPos is not None and 
-            event.button() == Qt.LeftButton and 
+            event.button() == Qt.MouseButton.LeftButton and 
             event.pos() in self.rect()):
                 self.clicked.emit()  
         self.pressPos = None

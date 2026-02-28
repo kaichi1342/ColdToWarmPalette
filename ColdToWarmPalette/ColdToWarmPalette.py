@@ -26,15 +26,17 @@ import  math, os, random, json
 from functools import partial
 
  
-from PyQt5.QtCore import ( Qt, QSize,  QTimer, QPoint )
+from PyQt6.QtCore import ( Qt, QSize,  QTimer, QPoint )
   
 
-from PyQt5.QtWidgets import ( 
+from PyQt6.QtWidgets import ( 
     QApplication,
     QVBoxLayout,  QGridLayout,  QHBoxLayout, 
     QPushButton, QWidget, QLabel, QComboBox,
-    QToolButton, QDesktopWidget , QSlider 
-)
+    QToolButton, QSlider 
+    
+) 
+#QDesktopWidget , 
 
 from .CWP_ColorManager import *  
 from .CWP_SettingsDialog import *
@@ -204,10 +206,10 @@ class ColdToWarmPalette(DockWidget):
         # TOOL BUTTON  #
         # ------------ #
 
-        self.color_variance     = QSlider(Qt.Horizontal)
+        self.color_variance     = QSlider(Qt.Orientation.Horizontal)
         
         self.color_variance.setRange(2,30)  
-        self.color_variance.setTickPosition(QSlider.NoTicks)
+        self.color_variance.setTickPosition(QSlider.TickPosition.NoTicks)
         self.color_variance.setTickInterval(1)
         self.color_variance.setValue(self.settings["hue_max"])
 
@@ -837,16 +839,9 @@ class ColdToWarmPalette(DockWidget):
     def moveDialog(self, dialog):
         gp = self.mapToGlobal(QPoint(0, 0))     
          
-        if self.x() < ( QDesktopWidget().screenGeometry().width() // 2) : 
+        if self.x() < ( self.screen().geometry().width() // 2) : 
             dialog.move(gp.x() + self.frameGeometry().width() + 10, gp.y() + 30) 
         else:  
             dialog.move(gp.x() - (dialog.frameGeometry().width() + 5 )  , gp.y() + 30) 
 
 
-
-instance = Krita.instance()
-dock_widget_factory = DockWidgetFactory(DOCKER_ID,
-                                        DockWidgetFactoryBase.DockRight,
-                                        ColdToWarmPalette)
-
-instance.addDockWidgetFactory(dock_widget_factory) 
